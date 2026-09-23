@@ -1,6 +1,6 @@
 # Kafka Stream Processor — the three things that actually go wrong
 
-> **Sep 2026:** first release — an at-least-once consumer with idempotent processing, a dead-letter topic and correct offset handling; MSK Serverless with topic-scoped IAM auth; 9 tests against a fake broker that reproduces rebalance replay. Validated, deliberately not applied.
+> **Sep 2026:** first release — an at-least-once consumer with idempotent processing, a dead-letter topic and correct offset handling; MSK Serverless with topic-scoped IAM auth. **12 tests: 9 against a fake broker, 3 against a real one** (Redpanda, in CI as a service container). MSK itself deliberately not applied.
 
 Producing and consuming is the easy part, and every quickstart shows it. This
 repo is about what happens **at a rebalance, on a redelivery, and when one record
@@ -79,10 +79,17 @@ and the part that is actually hard — the consumer's behaviour — is proven ag
 the fake broker rather than asserted in prose.
 
 ```bash
-python -m pytest tests -q                      # no broker needed
-terraform -chdir=terraform test                # mocked provider
-docker compose up -d                           # a real broker, to explore
+python -m pytest tests -q            # 9 unit tests, no broker (integration skips)
+docker compose up -d                 # Redpanda, ~2s
+python -m pytest tests -q            # now 12 — the 3 integration tests run too
+terraform -chdir=terraform test      # mocked provider
 ```
+
+The integration tests are the ones that prove the *fake was faithful*: that the
+adapter really maps confluent-kafka's surface onto the processor's interface, and
+that a second consumer in the same group resumes **after** the committed offset
+rather than replaying. They skip automatically with no broker, so the fast path
+stays fast.
 
 ## Not affiliated with Apache or Confluent — a personal learning + portfolio project by
 [Rajolu Abheenash](https://abheenash.com).

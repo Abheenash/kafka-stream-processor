@@ -112,3 +112,24 @@ jobs:
         with:
           fail-on-severity: high
           comment-summary-in-pr: always
+
+  # The same processor, against a REAL broker. The unit tests prove the logic
+  # against a fake; this proves the fake was faithful — that the adapter maps
+  # confluent-kafka's surface correctly and that offset commits, redelivery and
+  # DLQ writes behave the way the fake models them.
+  integration:
+    name: pytest (real broker)
+    runs-on: ubuntu-latest
+    services:
+      redpanda:
+        image: redpandadata/redpanda:v25.2.5
+        ports: ["9092:9092"]
+        options: >-
+          --health-cmd "rpk cluster health | grep -q 'Healthy:.*true'"
+          --health-interval 5s --health-timeout 3s --health-retries 12
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - run: pip install -r tests/requirements.txt -r requirements.txt
+      - run: python -m pytest tests/test_integration.py -v
