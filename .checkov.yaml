@@ -4,3 +4,10 @@ directory:
   - terraform
 compact: true
 quiet: true
+skip-check:
+  # CKV2_AWS_5: the security groups are not attached to anything in this module.
+  # That is correct — this repo provisions the MSK cluster and the consumer's SG,
+  # and the consumer itself (an ECS service or a Lambda) is deployed separately
+  # so its lifecycle is not tied to the broker's. The SG exists to be referenced,
+  # which is exactly what the ingress rule on the cluster does.
+  - CKV2_AWS_5
