@@ -1,0 +1,98 @@
+# Strict linting, deliberately without an imposed formatter.
+#
+# `ruff format` would rewrite ~270 files here and in several places make
+# hand-tuned compact code harder to read for no correctness benefit. In repos
+# whose purpose is to be READ by a reviewer, burying the engineering under a
+# style diff is a net loss. The rules below are the part that catches defects,
+# and they are enforced in CI.
+#
+# Every entry in `ignore` and `per-file-ignores` carries the reason it is there.
+# A silent exclusion is indistinguishable from a bug nobody noticed.
+line-length = 120
+target-version = "py313"
+
+exclude = [
+  ".venv", "venv", "__pycache__", ".terraform",
+  "**/collections/**",   # ansible-galaxy vendors upstream code here
+  "**/build/**",
+]
+
+[lint]
+select = [
+  "E", "W",  # pycodestyle
+  "F",       # pyflakes
+  "I",       # import sorting
+  "N",       # pep8 naming
+  "UP",      # pyupgrade
+  "B",       # bugbear — real bug patterns, not style
+  "C4",      # comprehension misuse
+  "DTZ",     # naive datetimes (a real source of off-by-hours bugs in Lambdas)
+  "SIM",     # simplification
+  "PTH",     # prefer pathlib over os.path
+  "RUF",     # ruff's own rules
+  "S",       # bandit security rules — the reason for running this at all
+  "T20",     # stray print()
+]
+
+ignore = [
+  # Long lines here are overwhelmingly prose: interview answers, resume content,
+  # Bedrock prompts, LaTeX templates and IAM policy literals. Splitting a
+  # sentence across lines makes the CONTENT worse, and a formatter cannot split
+  # them either. Code lines stay within the 120 above by convention.
+  "E501",
+  # `x = f(); y = g(x)` on one line is a deliberate, consistent style in this
+  # codebase for tightly-coupled pairs. It is legible and it is not a defect.
+  "E701", "E702",
+  # os.path is perfectly correct and is what every AWS Lambda example uses.
+  # A pathlib migration across ~40 call sites is churn with no behaviour change.
+  "PTH118", "PTH120", "PTH123", "PTH103", "PTH110", "PTH107", "PTH100", "PTH119",
+  # `import xml.etree.ElementTree as ET` — the uppercase alias is the convention
+  # the standard library's own docs use.
+  "N812",
+  # Em dashes and typographic quotes appear in user-facing strings on purpose.
+  "RUF001", "RUF002", "RUF003",
+  # Remaining pathlib preferences — same reasoning as the PTH entries above.
+  "PTH112", "PTH201", "PTH202", "PTH207",
+  # `class NotFound(Exception)` reads better than `NotFoundError` at the call
+  # site (`raise NotFound(...)`), and the suffix adds nothing.
+  "N818",
+]
+
+[lint.per-file-ignores]
+# `assert` IS the idiom in pytest; S101 there is noise, not a finding.
+# S105/S106 fire on moto's required fake credentials ("testing").
+# N803: boto3's API takes PascalCase kwargs (Bucket=, Key=, TargetGroupArn=,
+# modelId=). Test doubles must mirror that signature exactly or they do not
+# stand in for the real client.
+# E741: `l` as a line variable in a short comprehension is clear in context.
+"**/test_*.py"   = ["S101", "S105", "S106", "N803", "E741"]
+"**/tests/**"    = ["S101", "S105", "S106", "N803", "E741"]
+"**/conftest.py" = ["S101", "S105", "S106", "N803", "E741"]
+
+# Checkov discovers custom policies by importing each file and reading its
+# `check` object; the convention in its own codebase is one file per check,
+# named after the class. N999 would have me rename them to snake_case and
+# diverge from every example in the upstream docs.
+"**/policies/**" = ["N999"]
+
+# Operator scripts are CLIs: stdout is their interface.
+"**/scripts/**"    = ["T201", "S108"]
+"**/automation/**" = ["T201"]
+"**/pipeline/**"   = ["T201"]
+"**/evals/**"      = ["T201"]
+"**/incidents/**"  = ["T201"]
+
+# Lambda: print() goes straight to CloudWatch Logs and is the documented way to
+# log there. /tmp is the ONLY writable path in the execution environment, and it
+# is private to that environment — S108's shared-tmpdir threat model does not
+# apply.
+"**/src/**"     = ["T201", "S108"]
+"**/metrics/**" = ["T201"]
+"**/feedback/**" = ["T201"]
+
+[lint.isort]
+# src/ and tests/ are added to sys.path at runtime (the Lambda/consumer imports
+# them as top-level modules). Without this, ruff classifies them as third-party
+# when invoked from the repo root and first-party when invoked from inside it,
+# and the two orderings fight each other.
+known-first-party = ["processor", "fake_kafka"]

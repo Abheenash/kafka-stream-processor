@@ -1,0 +1,6 @@
+# Checkov config. `skip-check` is a REVIEWED baseline — each entry carries its
+# reason. Everything else is a hard gate.
+directory:
+  - terraform
+compact: true
+quiet: true
