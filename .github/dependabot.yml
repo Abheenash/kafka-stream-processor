@@ -14,7 +14,12 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      # Monthly, not weekly. Weekly across sixteen repositories is roughly a
+      # hundred pull requests a quarter, and a queue that size stops being read —
+      # which is worse than no automation, because the security ones get lost in
+      # it. SECURITY updates are unaffected by this interval and still arrive
+      # immediately; this only paces the routine version bumps.
+      interval: monthly
       day: monday
     open-pull-requests-limit: 5
     labels: ["dependencies"]
@@ -25,7 +30,12 @@ updates:
   - package-ecosystem: pip
     directory: "/"
     schedule:
-      interval: weekly
+      # Monthly, not weekly. Weekly across sixteen repositories is roughly a
+      # hundred pull requests a quarter, and a queue that size stops being read —
+      # which is worse than no automation, because the security ones get lost in
+      # it. SECURITY updates are unaffected by this interval and still arrive
+      # immediately; this only paces the routine version bumps.
+      interval: monthly
       day: monday
     open-pull-requests-limit: 5
     labels: ["dependencies"]
@@ -36,7 +46,12 @@ updates:
   - package-ecosystem: pip
     directory: "/tests"
     schedule:
-      interval: weekly
+      # Monthly, not weekly. Weekly across sixteen repositories is roughly a
+      # hundred pull requests a quarter, and a queue that size stops being read —
+      # which is worse than no automation, because the security ones get lost in
+      # it. SECURITY updates are unaffected by this interval and still arrive
+      # immediately; this only paces the routine version bumps.
+      interval: monthly
       day: monday
     open-pull-requests-limit: 5
     labels: ["dependencies"]
@@ -47,7 +62,12 @@ updates:
   - package-ecosystem: terraform
     directory: "/terraform"
     schedule:
-      interval: weekly
+      # Monthly, not weekly. Weekly across sixteen repositories is roughly a
+      # hundred pull requests a quarter, and a queue that size stops being read —
+      # which is worse than no automation, because the security ones get lost in
+      # it. SECURITY updates are unaffected by this interval and still arrive
+      # immediately; this only paces the routine version bumps.
+      interval: monthly
       day: monday
     open-pull-requests-limit: 5
     labels: ["dependencies"]

@@ -14,7 +14,7 @@ jobs:
     name: gitleaks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with: { fetch-depth: 0 }
       - name: gitleaks (secrets)
         # Not gitleaks-action: it scans a commit RANGE (base^..head), and on a
@@ -29,25 +29,25 @@ jobs:
     name: pytest (fake broker)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with: { python-version: "3.13" }
       - run: pip install -r tests/requirements.txt
       # No docker, no broker: the fake reproduces per-partition ordering,
       # committed offsets, lost commits and rebalance replay, which is everything
       # these tests assert.
-      - run: python -m pytest tests -q
+      - run: python -m pytest tests -q --cov --cov-report=term-missing
 
   iac-scan:
     name: checkov + terraform
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: bridgecrewio/checkov-action@v12
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: bridgecrewio/checkov-action@444c9db6fa75e2d9c19ebf1fde7322089be9009e # v12
         with:
           directory: terraform
           config_file: .checkov.yaml
-      - uses: hashicorp/setup-terraform@v4
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
       - name: fmt + validate
         working-directory: terraform
         run: |
@@ -59,8 +59,8 @@ jobs:
     name: terraform test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: hashicorp/setup-terraform@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
         with: { terraform_wrapper: false }
       - name: terraform test
         working-directory: ${{ github.workspace }}/terraform
@@ -72,8 +72,8 @@ jobs:
     name: tflint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: terraform-linters/setup-tflint@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: terraform-linters/setup-tflint@1cf010d3c7aef302051ccdb68c14c5dc2efa34ef # v6
         with: { tflint_version: v0.64.0 }
       - name: tflint
         working-directory: ${{ github.workspace }}
@@ -94,8 +94,8 @@ jobs:
     name: ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/ruff-action@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/ruff-action@4919ec5cf1f49eff0871dbcea0da843445b837e6 # v3
         with:
           version: 0.16.8
           args: check --output-format github
@@ -107,12 +107,12 @@ jobs:
       security-events: write
       contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: github/codeql-action/init@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
         with:
           languages: python
           queries: security-and-quality
-      - uses: github/codeql-action/analyze@v4
+      - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
 
   dependency-review:
     runs-on: ubuntu-latest
@@ -125,8 +125,8 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/dependency-review-action@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
           comment-summary-in-pr: always
@@ -146,8 +146,8 @@ jobs:
           --health-cmd "rpk cluster health | grep -q 'Healthy:.*true'"
           --health-interval 5s --health-timeout 3s --health-retries 12
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with: { python-version: "3.13" }
       - run: pip install -r tests/requirements.txt -r requirements.txt
       - run: python -m pytest tests/test_integration.py -v

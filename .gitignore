@@ -21,3 +21,12 @@ crash.log
 * [0-9].yaml
 * [0-9].yml
 * [0-9].py
+
+# Coverage output. `.coverage` is a binary SQLite database of line hits from the
+# last run — a build artifact, not source. Committing it means every test run
+# shows up as a diff, and the file is meaningless on any machine but the one that
+# produced it.
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/

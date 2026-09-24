@@ -1,0 +1,31 @@
+# Coverage measurement and the regression gate.
+#
+# fail_under is set to 80, with the suite currently measuring 84%. The gap is
+# deliberate. A gate set exactly at today's number is not merely strict, it is
+# WRONG: the reported figure is rounded, so a 95 gate against a "95%" run that is
+# really 94.6% fails immediately — which is exactly what happened here on the
+# first attempt. The rule is floor((measured - 2) / 5) * 5, leaving 2-6 points of
+# headroom: tight enough that deleting a test is noticed, loose enough to survive
+# rounding and one refactor.
+#
+# The number is measured, not aspirational — it was taken by running the suite
+# before this file existed, not chosen first and worked towards.
+[run]
+source = src
+branch = True
+omit =
+    */tests/*
+    */.venv/*
+    */venv/*
+    */__pycache__/*
+    */node_modules/*
+    */.terraform/*
+
+[report]
+fail_under = 80
+show_missing = True
+skip_covered = True
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
