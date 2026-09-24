@@ -77,6 +77,15 @@ jobs:
         with: { tflint_version: v0.64.0 }
       - name: tflint
         working-directory: ${{ github.workspace }}
+        # GITHUB_TOKEN is not optional here. `tflint --init` downloads the ruleset
+        # plugins from the GitHub releases API, and unauthenticated that call shares
+        # a rate limit with every other runner on the same egress IP -- so it works
+        # until the day the account is busy, then fails with "403 API rate limit
+        # exceeded" having linted nothing. That is exactly how it broke: merging a
+        # batch of dependency PRs ran enough CI to exhaust it. The token is issued
+        # to every workflow run automatically and needs no setup.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tflint --init --config="${{ github.workspace }}/.tflint.hcl"
           tflint --chdir=terraform --config="${{ github.workspace }}/.tflint.hcl"
