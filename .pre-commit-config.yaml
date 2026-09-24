@@ -5,6 +5,11 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        # Two trailing spaces in Markdown are a hard line break, not whitespace to
+        # clean up. Without this flag the hook silently rewrites the document: the
+        # line joins with the next one and the rendered output changes. Caught the
+        # first time these hooks were actually run, on a real evals write-up.
+        args: [--markdown-linebreak-ext=md]
       - id: end-of-file-fixer
       - id: check-yaml
         args: [--allow-multiple-documents]
