@@ -1,2 +1,11 @@
+# Test-only dependencies.
+#
+# The application's own pins live in requirements.txt and are pulled in with -r rather than
+# repeated here. They used to be repeated, and that is not a style preference:
+# Dependabot treats each requirements file as its own thing, so it bumped
+# confluent-kafka here and not there, and `pip install -r tests/... -r requirements.txt` then failed
+# to resolve. One source of truth per dependency is what makes the bot's PRs
+# installable.
+-r ../requirements.txt
+
 pytest>=8
-confluent-kafka==2.6.1
