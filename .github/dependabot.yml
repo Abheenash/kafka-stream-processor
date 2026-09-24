@@ -1,0 +1,59 @@
+# Dependency updates.
+#
+# Dependabot rather than Renovate, for a reason worth stating: Renovate is the
+# better tool, but it is a GitHub App that has to be installed on the account,
+# and until it is, a renovate.json is a config file that looks like working
+# automation and updates nothing. Dependabot is native — this file is the whole
+# setup — and it has been demonstrably opening real PRs on these repos.
+#
+# Grouping is the point of the packageEcosystem blocks below. Ten separate
+# action-bump PRs a week is how people start ignoring the bot, which is worse
+# than not having one.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+    groups:
+      # Actions are rarely breaking and almost always want reviewing together.
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+    groups:
+      minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+  - package-ecosystem: pip
+    directory: "/tests"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+    groups:
+      minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+  - package-ecosystem: terraform
+    directory: "/terraform"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+    groups:
+      # Provider/module minors and patches together; majors stay separate
+      # because they carry upgrade guides (aws v5->v6, eks module 20->21).
+      terraform-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
