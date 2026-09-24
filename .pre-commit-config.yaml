@@ -32,3 +32,12 @@ repos:
     rev: v8.30.0
     hooks:
       - id: gitleaks
+
+  # Same ruff, same version as the CI job. Without this, pre-commit passes locally
+  # and CI fails on lint — which is precisely what happened when the LocalStack
+  # tests were added: eleven hooks green here, four ruff findings on the runner.
+  # Local gates that do not mirror CI teach people to ignore them.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.8
+    hooks:
+      - id: ruff-check
