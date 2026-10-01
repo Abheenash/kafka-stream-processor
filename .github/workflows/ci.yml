@@ -129,7 +129,7 @@ jobs:
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: high
-          comment-summary-in-pr: always
+          comment-summary-in-pr: on-failure
 
   # The same processor, against a REAL broker. The unit tests prove the logic
   # against a fake; this proves the fake was faithful — that the adapter maps
